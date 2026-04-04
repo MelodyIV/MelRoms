@@ -1,0 +1,19 @@
+{
+    "name": "Cyber Amber",
+    "colors": {
+        "bg": "#050505",
+        "fg": "#ffb000",
+        "accent": "#ffcc00",
+        "surface": "#121212",
+        "border": "#333333",
+        "btn_bg": "#1a1a1a",
+        "btn_hover": "#252525",
+        "error": "#ff3333",
+        "cyan": "#00ffff"
+    },
+    "fonts": {
+        "mono": ["Consolas", 10],
+        "mono_bold": ["Consolas", 11, "bold"],
+        "header": ["Courier New", 14, "bold"]
+    }
+}
