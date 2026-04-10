@@ -1,0 +1,35 @@
+# Graphics & UI
+pygame-ce
+customtkinter
+Pillow
+pygments
+
+# System & Automation
+psutil
+pygetwindow
+pyautogui
+pynput
+GPUtil
+pyinstaller
+
+# Networking & Integration
+ping3
+pydivert
+requests
+discord.py
+pypresence
+ollama
+
+# Media & Audio
+yt-dlp
+python-vlc
+mutagen
+pyttsx3
+
+# Math & 3D Wireframes
+numpy
+pyrr
+
+# Terminal Enhancement
+colorama
+rich
