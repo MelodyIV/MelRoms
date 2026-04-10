@@ -1,0 +1,50 @@
+{
+    "theme_info": {
+        "name": "Midnight Rose",
+        "author": "MelRoms + Gemini"
+    },
+
+    "root_alpha": 1.0,
+
+    "bg_root": "#1a0f14",
+
+    "padding_outer": 14,
+
+    "bg_panel": "#26161e",
+    "panel_border_width": 2,
+    "panel_relief": "flat",
+
+    "btn_bg": "#3d222f",
+    "btn_fg": "#ffb3d9",
+    "btn_active_bg": "#5c2a4a",
+    "btn_active_fg": "#ffffff",
+    "btn_border": 1,
+    "btn_relief": "flat",
+    "btn_padx": 14,
+    "btn_pady": 9,
+
+    "mute_bg": "#3d222f",
+    "mute_active_bg": "#8c2d59",
+
+    "tree_bg": "#1f1218",
+    "tree_fg": "#eba4c7",
+    "tree_header_bg": "#331a26",
+    "tree_header_fg": "#ff9ed9",
+    "tree_selected_bg": "#5c2a4a",
+    "tree_selected_fg": "#ffffff",
+    "tree_row_height": 28,
+
+    "info_label_fg": "#ff85c2",
+    "info_text_bg": "#140b0f",
+    "info_text_fg": "#d69cb8",
+
+    "anim_bg": "#000000",
+
+    "anim_speed_mult": 1.0,
+    "anim_jitter_mult": 0.4,
+    "anim_pixel_size": 7,
+
+    "font_ui": ["Segoe UI", 10, "bold"],
+    "font_list": ["Segoe UI", 9],
+    "font_nfo": ["Consolas", 10]
+}

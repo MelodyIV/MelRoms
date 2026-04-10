@@ -1,0 +1,27 @@
+DEFAULT_THEME = {
+    "name": "Dark MelRoms",
+    "bg_root": "#111111",
+    "bg_panel": "#111111",
+    "bg_anim_frame": "#000000",
+    "btn_bg": "#222222",
+    "btn_fg": "#FFFFFF",
+    "btn_active_bg": "#444444",
+    "btn_active_fg": "#00FFCC",
+    "mute_bg": "#333333",
+    "mute_fg": "#FFFFFF",
+    "mute_active_bg": "#FF3333",
+    "tree_bg": "#151515",
+    "tree_fg": "#CCCCCC",
+    "tree_header_bg": "#222222",
+    "tree_header_fg": "#00FFCC",
+    "tree_selected_bg": "#00FFCC",
+    "tree_selected_fg": "#000000",
+    "info_frame_fg": "#00FFCC",
+    "info_text_bg": "#080808",
+    "info_text_fg": "#BBBBBB",
+    "slider_bg": "#222222",      # new: slider background
+    "slider_trough": "#333333",   # new: slider trough color
+    "slider_slider": "#00FFCC",   # new: slider handle color
+    "font_main": ["Arial", 9, "bold"],
+    "font_mono": ["Courier New", 9]
+}

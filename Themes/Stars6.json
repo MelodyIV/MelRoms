@@ -1,0 +1,49 @@
+{
+    "theme_info": {
+        "name": "Yellow-White Star",
+        "author": "Claude"
+    },
+    "root_alpha": 1,
+    "bg_root": "#1a1508",
+    "padding_outer": 14,
+    "bg_panel": "#251d06",
+    "panel_border_width": 2,
+    "panel_relief": "flat",
+    "btn_bg": "#3a2a08",
+    "btn_fg": "#ffd966",
+    "btn_active_bg": "#5c4210",
+    "btn_active_fg": "#fff8d6",
+    "btn_border": 1,
+    "btn_relief": "flat",
+    "btn_padx": 14,
+    "btn_pady": 9,
+    "mute_bg": "#3a2a08",
+    "mute_active_bg": "#8c6d0a",
+    "tree_bg": "#110e03",
+    "tree_fg": "#e8c96e",
+    "tree_header_bg": "#2b2208",
+    "tree_header_fg": "#ffe066",
+    "tree_selected_bg": "#5c4210",
+    "tree_selected_fg": "#fff8d6",
+    "tree_row_height": 28,
+    "info_label_fg": "#ffc933",
+    "info_text_bg": "#0e0b02",
+    "info_text_fg": "#d4ad5e",
+    "anim_bg": "#000000",
+    "anim_speed_mult": 1,
+    "anim_jitter_mult": 0.4,
+    "anim_pixel_size": 7,
+    "font_ui": [
+        "Segoe UI",
+        10,
+        "bold"
+    ],
+    "font_list": [
+        "Segoe UI",
+        9
+    ],
+    "font_nfo": [
+        "Consolas",
+        10
+    ]
+}
