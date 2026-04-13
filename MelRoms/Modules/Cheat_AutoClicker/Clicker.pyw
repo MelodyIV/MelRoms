@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os    
 import time
 import threading
 import random
@@ -168,7 +169,7 @@ class ToolTip:
 class MelRomsUltimateAC:
     def __init__(self, root):
         self.root = root
-        self.root.title("MelRoms Ultimate AC")
+        self.root.title("MelRoms Auto")
         self.root.geometry("540x1080")
         self.root.configure(bg=MIKU_DARK)
         self.root.resizable(False, False)
@@ -203,11 +204,19 @@ class MelRomsUltimateAC:
         self.setup_hotkey()
         self.update_cps_display()
 
+        try:
+            base_dir = os.path.dirname(__file__)
+            icon_path = os.path.join(base_dir, "icon.ico")
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"Icon failed to load: {e}")
+
     def create_widgets(self):
         main = tk.Frame(self.root, bg=MIKU_DARK)
         main.pack(fill=tk.BOTH, expand=True, padx=20, pady=15)
 
-        tk.Label(main, text="─── MelRoms Ultimate AC ───", font=("Courier", 12, "bold"), fg=MIKU_PINK, bg=MIKU_DARK).pack()
+        tk.Label(main, text="─── MelRoms Clicker ───", font=("Courier", 12, "bold"), fg=MIKU_PINK, bg=MIKU_DARK).pack()
 
         self.stat_frame = tk.Frame(main, bg=MIKU_DARK)
         self.stat_frame.pack(fill=tk.X, pady=5)

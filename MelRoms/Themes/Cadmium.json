@@ -1,49 +1,38 @@
 {
     "theme_info": {
-        "name": "Midnight Rose",
+        "name": "Cadmium Autumn",
         "author": "MelRoms"
     },
-
     "root_alpha": 1.0,
-
-    "bg_root": "#1a0f14",
-
+    "bg_root": "#1a0c0f",
     "padding_outer": 14,
-
-    "bg_panel": "#26161e",
+    "bg_panel": "#261217",
     "panel_border_width": 2,
     "panel_relief": "flat",
-
-    "btn_bg": "#3d222f",
-    "btn_fg": "#ffb3d9",
-    "btn_active_bg": "#5c2a4a",
+    "btn_bg": "#3f1e22",
+    "btn_fg": "#ff9f4d",
+    "btn_active_bg": "#e30022",
     "btn_active_fg": "#ffffff",
     "btn_border": 1,
     "btn_relief": "flat",
     "btn_padx": 14,
     "btn_pady": 9,
-
-    "mute_bg": "#3d222f",
-    "mute_active_bg": "#8c2d59",
-
-    "tree_bg": "#1f1218",
-    "tree_fg": "#eba4c7",
-    "tree_header_bg": "#331a26",
-    "tree_header_fg": "#ff9ed9",
-    "tree_selected_bg": "#5c2a4a",
+    "mute_bg": "#3f1e22",
+    "mute_active_bg": "#ff6500",
+    "tree_bg": "#1f0f13",
+    "tree_fg": "#ffbb77",
+    "tree_header_bg": "#33181f",
+    "tree_header_fg": "#fff600",
+    "tree_selected_bg": "#e30022",
     "tree_selected_fg": "#ffffff",
     "tree_row_height": 28,
-
-    "info_label_fg": "#ff85c2",
-    "info_text_bg": "#140b0f",
-    "info_text_fg": "#d69cb8",
-
+    "info_label_fg": "#ff5e2a",
+    "info_text_bg": "#14080b",
+    "info_text_fg": "#f8b88a",
     "anim_bg": "#000000",
-
     "anim_speed_mult": 1.0,
     "anim_jitter_mult": 0.4,
     "anim_pixel_size": 7,
-
     "font_ui": ["Segoe UI", 10, "bold"],
     "font_list": ["Segoe UI", 9],
     "font_nfo": ["Consolas", 10]

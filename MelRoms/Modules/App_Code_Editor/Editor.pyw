@@ -13,6 +13,16 @@ from pathlib import Path
 from typing import Optional, Dict, List, Any
 import tempfile
 import zipfile
+import time
+from datetime import datetime, timedelta
+
+# Discord RPC
+try:
+    from pypresence import Presence
+    DISCORD_RPC_AVAILABLE = True
+except ImportError:
+    DISCORD_RPC_AVAILABLE = False
+    print("pypresence not installed. Discord RPC disabled. Run: pip install pypresence")
 
 try:
     import ollama
@@ -348,6 +358,7 @@ class CodeEditor(tk.Frame):
         self._highlight_job = None
         self._modified = False
         self._completion_popup = None
+        self._opened_time = time.time()
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
@@ -428,6 +439,12 @@ class CodeEditor(tk.Frame):
         self.text.bind("<Control-Shift-S>", lambda e: self.save_as())
         self.text.bind("<F5>", lambda e: self.reload())
         self.text.bind("<Button-3>", self._show_context_menu)
+        self.text.bind("<KeyRelease>", self._on_cursor_move, add=True)
+        self.text.bind("<ButtonRelease-1>", self._on_cursor_move, add=True)
+
+    def _on_cursor_move(self, event=None):
+        if self.master and hasattr(self.master, 'master') and hasattr(self.master.master, 'update_discord_presence'):
+            self.master.master.update_discord_presence()
 
     def _on_scroll(self, *args):
         self.text.yview(*args)
@@ -602,6 +619,14 @@ class CodeEditor(tk.Frame):
 
     def get_content(self) -> str:
         return self.text.get("1.0", "end-1c")
+
+    def get_cursor_position(self):
+        cursor = self.text.index("insert")
+        line, col = cursor.split('.')
+        return int(line), int(col)
+
+    def get_total_chars(self):
+        return len(self.get_content())
 
     def save(self) -> bool:
         if not self.file_path or not self.file_path.absolute():
@@ -1057,6 +1082,7 @@ class CompactChatPanel(tk.Frame):
                 self.append_text("System", f"Error reading file: {e}")
         else:
             self.append_text("System", f"File not found: {filename}")
+
     def send_message(self):
         user_text = self.msg_input.get("1.0", "end-1c").strip()
         if not user_text and not self.attached_image_b64 and not self.zip_extract_path:
@@ -1070,6 +1096,7 @@ class CompactChatPanel(tk.Frame):
             self.append_text("System", "Ollama is not installed.")
             return
         threading.Thread(target=self._get_ai_response, args=(user_text,), daemon=True).start()
+
     def _get_ai_response(self, user_text):
         try:
             editor = self.editor_app.current_editor
@@ -1104,6 +1131,7 @@ class CompactChatPanel(tk.Frame):
             self.after(0, lambda: self.append_text("Saturn", response['message']['content']))
         except Exception as e:
             self.after(0, lambda: self.append_text("Error", str(e)))
+
 class ModuleEditor:
     def __init__(self, root):
         self.root = root
@@ -1115,12 +1143,79 @@ class ModuleEditor:
         self.current_editor: Optional[CodeEditor] = None
         self.global_language = tk.StringVar(value="python")
         self._drag_tab_data = None
+        self._rpc = None
+        self._rpc_running = True
+        self._rpc_thread = None
         self._setup_ui()
         self._setup_statusbar()
         self._setup_menu()
         self._setup_toolbar()
-        self.load_theme("Miku_Cyber")  
+        self.load_theme("Miku_Cyber")
         self.load_session()
+        try:
+            base_dir = os.path.dirname(__file__)
+            icon_path = os.path.join(base_dir, "icon.ico")
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"Icon failed to load: {e}")
+        self._init_discord_rpc()
+        self._start_rpc_updater()
+
+    def _init_discord_rpc(self):
+        if not DISCORD_RPC_AVAILABLE:
+            return
+        try:
+            CLIENT_ID = "1472951903636947150"
+            self._rpc = Presence(CLIENT_ID)
+            self._rpc.connect()
+            print("Discord RPC connected")
+        except Exception as e:
+            print(f"Failed to connect Discord RPC: {e}")
+            self._rpc = None
+
+    def _start_rpc_updater(self):
+        if not self._rpc:
+            return
+        def updater():
+            while self._rpc_running:
+                self.update_discord_presence()
+                time.sleep(15)
+        self._rpc_thread = threading.Thread(target=updater, daemon=True)
+        self._rpc_thread.start()
+
+    def update_discord_presence(self):
+        if not self._rpc:
+            return
+        editor = self.current_editor
+        if not editor:
+            return
+        file_name = editor.file_path.name if editor.file_path else "Untitled"
+        language = editor.language.upper()
+        if language == 'TEXT':
+            language = 'Plain Text'
+        line, col = editor.get_cursor_position()
+        total_chars = editor.get_total_chars()
+        elapsed = time.time() - editor._opened_time
+        minutes = int(elapsed // 60)
+        seconds = int(elapsed % 60)
+        time_str = f"{minutes}m {seconds}s"
+        details = f"Working on {file_name}"
+        state = f"Line {line}, Col {col} | {total_chars} chars | {language}"
+        try:
+            self._rpc.update(
+                details=details,
+                state=state,
+                start=int(editor._opened_time),
+                large_image="miku_icon",
+                large_text="MelRoms Editor",
+                small_image="python" if language == "PYTHON" else "lua" if language == "LUA" else "text",
+                small_text=language,
+                buttons=[{"label": "Get MelRoms", "url": "https://github.com/MelodyIV/MelRoms"}]
+            )
+        except Exception as e:
+            print(f"RPC update error: {e}")
+
     def _setup_ui(self):
         self.paned = ttk.PanedWindow(self.root, orient="horizontal")
         self.paned.pack(fill="both", expand=True)
@@ -1135,12 +1230,14 @@ class ModuleEditor:
         self.notebook.bind("<ButtonRelease-1>", self._on_tab_drag_release)
         self.chat_panel = CompactChatPanel(self.paned, self, width=350)
         self.paned.add(self.chat_panel)
+
     def _setup_statusbar(self):
         self.status_var = tk.StringVar(value="Ready")
         status = tk.Label(self.root, textvariable=self.status_var, bg=theme.get_color("status_bg"),
                           fg=theme.get_color("status_fg"), anchor="w")
         status.pack(side="bottom", fill="x")
         theme.register(status, {"background": "status_bg", "foreground": "status_fg"})
+
     def _setup_menu(self):
         menubar = tk.Menu(self.root,
                           bg=theme.get_color("menu_bg"),
@@ -1213,6 +1310,7 @@ class ModuleEditor:
         self.root.bind("<Control-f>", lambda e: self.show_find_dialog_current())
         self.root.bind("<Control-h>", lambda e: self.show_replace_dialog())
         self.root.bind("<F5>", lambda e: self.execute_current())
+
     def _setup_toolbar(self):
         toolbar = tk.Frame(self.root, bg=theme.get_color("toolbar_bg"), height=36)
         toolbar.pack(side="top", fill="x")
@@ -1243,6 +1341,7 @@ class ModuleEditor:
                             relief="flat", padx=8, pady=2)
             btn.pack(side="left", padx=2, pady=2)
             theme.register(btn, {"background": "button_bg", "foreground": "button_fg", "activebackground": "button_active_bg"})
+
     def _on_tab_drag_start(self, event):
         try:
             index = self.notebook.index(f"@{event.x},{event.y}")
@@ -1250,8 +1349,10 @@ class ModuleEditor:
                 self._drag_tab_data = {"index": index, "widget": self.notebook.tabs()[index]}
         except:
             pass
+
     def _on_tab_drag_motion(self, event):
         pass
+
     def _on_tab_drag_release(self, event):
         if not self._drag_tab_data:
             return
@@ -1285,11 +1386,13 @@ class ModuleEditor:
                                     messagebox.showerror("Move Error", str(e))
                             break
         self._drag_tab_data = None
+
     def _on_language_changed(self, event=None):
         new_lang = self.global_language.get()
         if self.current_editor:
             self.current_editor.set_language(new_lang)
             self.status_var.set(f"Language set to {new_lang}")
+
     def load_theme(self, theme_name):
         theme.load_theme(theme_name)
         for editor in self.tabs.values():
@@ -1320,6 +1423,7 @@ class ModuleEditor:
         self.notebook.add(editor, text=path.name)
         self.notebook.select(editor)
         self._save_session()
+        self.update_discord_presence()
 
     def _on_editor_modified(self, editor: CodeEditor, modified: bool):
         for key, ed in self.tabs.items():
@@ -1330,6 +1434,8 @@ class ModuleEditor:
                     title = "*" + title
                 self.notebook.tab(idx, text=title)
                 break
+        if editor == self.current_editor:
+            self.update_discord_presence()
 
     def _on_tab_changed(self, event):
         current = self.notebook.select()
@@ -1340,6 +1446,7 @@ class ModuleEditor:
                     name = editor.file_path.name if editor.file_path else "Untitled"
                     self.status_var.set(f"Editing: {name}")
                     self.global_language.set(editor.language)
+                    self.update_discord_presence()
                     break
         else:
             self.current_editor = None
@@ -1356,6 +1463,7 @@ class ModuleEditor:
                         self.tabs[new_key] = self.current_editor
                 self.status_var.set(f"Saved: {self.current_editor.file_path.name}")
                 self._save_session()
+                self.update_discord_presence()
 
     def save_as_current(self):
         if self.current_editor:
@@ -1367,6 +1475,7 @@ class ModuleEditor:
                     self.tabs[new_key] = self.current_editor
                 self._on_editor_modified(self.current_editor, False)
                 self._save_session()
+                self.update_discord_presence()
 
     def save_all(self):
         for editor in self.tabs.values():
@@ -1412,6 +1521,7 @@ class ModuleEditor:
         self.notebook.forget(editor)
         self.current_editor = None
         self._save_session()
+        self.update_discord_presence()
 
     def undo(self):
         if self.current_editor:
@@ -1470,6 +1580,13 @@ class ModuleEditor:
                     if Path(p).exists():
                         self.open_file(Path(p))
             except Exception:
+                pass
+    def __del__(self):
+        self._rpc_running = False
+        if self._rpc:
+            try:
+                self._rpc.close()
+            except:
                 pass
 
 if __name__ == "__main__":

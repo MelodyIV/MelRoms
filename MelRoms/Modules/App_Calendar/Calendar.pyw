@@ -30,7 +30,7 @@ DEFAULT_THEME = {
     "btn_active_fg": "#0f172a",
     "accent_teal": "#22d3ee",
     "accent_pink": "#f472b6",
-    "font_main": ["Arial", 10, "bold"],
+    "font_main": ["Arial", 9, "bold"],
 }
 
 MIKU_TEAL = DEFAULT_THEME["accent_teal"]
@@ -38,7 +38,7 @@ MIKU_PINK = DEFAULT_THEME["accent_pink"]
 MIKU_DARK = DEFAULT_THEME["bg_root"]
 
 class Miku3DAnimator:
-    def __init__(self, parent, width=1250, height=320):
+    def __init__(self, parent, width=950, height=260):
         self.w, self.h = width, height
         self.canvas = tk.Canvas(parent, width=width, height=height,
                                 highlightthickness=0, bg=MIKU_DARK)
@@ -119,7 +119,7 @@ class Miku3DAnimator:
     def generate_decorations(self):
         self.deco_elements = []
         types = ['★', '♪', '♫', '★']
-        for i in range(10):
+        for i in range(8):  # fewer decorations for compactness
             if i % 3 == 0:
                 color_key = 'accent_teal'
             elif i % 3 == 1:
@@ -128,8 +128,8 @@ class Miku3DAnimator:
                 color_key = 'gold'
             self.deco_elements.append({
                 'angle': random.uniform(0, math.pi * 2),
-                'radius': random.uniform(180, 250),
-                'y_off': random.uniform(-80, 80),
+                'radius': random.uniform(160, 220),
+                'y_off': random.uniform(-70, 70),
                 'speed': random.uniform(0.8, 1.5),
                 'type': types[i % 4],
                 'color_key': color_key
@@ -144,8 +144,8 @@ class Miku3DAnimator:
             r"██║ ╚═╝ ██║███████╗███████╗██║  ██║╚██████╔╝██║ ╚═╝ ██║███████║",
             r"╚═╝     ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝"
         ]
-        font = ("Courier New", 8, "bold")
-        char_w, char_h = 7, 12
+        font = ("Courier New", 7, "bold")  # smaller font
+        char_w, char_h = 6, 10
         total_w = max(len(line) for line in art_lines) * char_w
         total_h = len(art_lines) * char_h
         start_x = (self.w - total_w) // 2
@@ -232,7 +232,7 @@ class Miku3DAnimator:
                 sx, sy, scale = self.project(rx, ry, rz)
                 color = self.hsv_to_hex(self.time, 0.6, 1.0) if self.has_event_today else self.get_deco_color(deco)
                 self.canvas.create_text(sx, sy, text=deco['type'], fill=color,
-                                        font=("Arial", int(12 * scale)), tag="decoration")
+                                        font=("Arial", int(10 * scale)), tag="decoration")
 
         self.draw_hair_strands(rot_y, rot_x, back_only=True)
         pulse = 1.0 + math.sin(self.time * 4) * 0.1
@@ -241,8 +241,8 @@ class Miku3DAnimator:
             for p in self.ribbon_pts:
                 rx, ry, rz = self.rotate_3d(p[0]*pulse + (side*65), p[1]*pulse - 85, p[2] + 10, rot_y, rot_x)
                 pts.append(self.project(rx, ry, rz)[:2])
-            self.canvas.create_polygon(pts, fill=MIKU_PINK, outline="#1a0a0a", width=2, tag="ribbon")
-            self.canvas.create_text(pts[0][0], pts[0][1], text="♥", fill="white", font=("Arial", 5), tag="ribbon")
+            self.canvas.create_polygon(pts, fill=MIKU_PINK, outline="#1a0a0a", width=1, tag="ribbon")
+            self.canvas.create_text(pts[0][0], pts[0][1], text="♥", fill="white", font=("Arial", 4), tag="ribbon")
 
         self.draw_hair_strands(rot_y, rot_x, back_only=False)
         for deco in self.deco_elements:
@@ -254,7 +254,7 @@ class Miku3DAnimator:
                 sx, sy, scale = self.project(rx, ry, rz)
                 color = self.hsv_to_hex(self.time, 0.6, 1.0) if self.has_event_today else self.get_deco_color(deco)
                 self.canvas.create_text(sx, sy, text=deco['type'], fill=color,
-                                        font=("Arial", int(14 * scale), "bold"), tag="decoration")
+                                        font=("Arial", int(12 * scale), "bold"), tag="decoration")
 
     def draw_hair_strands(self, rot_y, rot_x, back_only=True):
         for strand in self.hair_strands:
@@ -275,7 +275,7 @@ class Miku3DAnimator:
                     color = self.hsv_to_hex(self.time * 0.5, 0.7, 1.0)
                 else:
                     color = MIKU_TEAL
-                width = 3 if strand['type'] == 'tail' else 2
+                width = 2 if strand['type'] == 'tail' else 1
                 self.canvas.create_line(coords, fill=color, width=width,
                                         smooth=True, capstyle=tk.ROUND, tag="hair")
 
@@ -292,7 +292,7 @@ class Miku3DAnimator:
         for i in range(len(stalk_coords)-1):
             p1, p2 = stalk_coords[i], stalk_coords[i+1]
             color = f'#{int(255-p1[3]*10):02x}ff{int(255-p1[3]*10):02x}'
-            width = int(20 * p1[2])
+            width = int(16 * p1[2])
             self.canvas.create_line(p1[0], p1[1], p2[0], p2[1], fill=color,
                                     width=width, capstyle=tk.ROUND, tag="leek")
 
@@ -301,7 +301,7 @@ class Miku3DAnimator:
             for pt in branch:
                 rx, ry, rz = self.rotate_3d(pt[0]*squash, pt[1], pt[2]*squash, leek_rot_y, rot_x)
                 coords.append(self.project(rx, ry, rz)[:2])
-            self.canvas.create_line(coords, fill="#4ade80", width=12,
+            self.canvas.create_line(coords, fill="#4ade80", width=10,
                                     smooth=True, capstyle=tk.ROUND, tag="leek")
 
         for deco in self.deco_elements:
@@ -310,17 +310,16 @@ class Miku3DAnimator:
             sx, sy, scale = self.project(rx, ry, rz)
             color = self.hsv_to_hex(self.time * 2, 0.8, 1.0)
             self.canvas.create_text(sx, sy, text=deco['type'], fill=color,
-                                    font=("Arial", int(9 * scale)), tag="leek")
+                                    font=("Arial", int(8 * scale)), tag="leek")
 
 class MikuCalendarApp:
     def __init__(self, root):
         self.root = root
         self.root.title("MelRoms Calendar")
-        self.root.geometry("1280x820")
+        self.root.geometry("950x580")
         self.root.configure(bg=MIKU_DARK)
         self.current_date = datetime.now()
         self.events = self.load_events()
-        self.root.iconbitmap(os.path.join(os.path.dirname(__file__), "icon.ico"))
         self.is_muted = False
         self.leek_mode = False
 
@@ -329,9 +328,15 @@ class MikuCalendarApp:
 
         self.init_audio()
         self.load_external_themes()
-        print("Available themes:", [t['name'] for t in self.available_themes])
         self.create_widgets()
         self.refresh_calendar()
+        try:
+            base_dir = os.path.dirname(__file__)
+            icon_path = os.path.join(base_dir, "icon.ico")
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"Icon failed to load: {e}")
 
     def init_audio(self):
         if AUDIO_SUPPORT:
@@ -367,7 +372,7 @@ class MikuCalendarApp:
             
     def load_external_themes(self):
         theme_path = os.path.join(os.path.dirname(__file__), "Themes", "theme.json")
-        self.available_themes = [DEFAULT_THEME] # Always have the default as backup
+        self.available_themes = [DEFAULT_THEME]
         if os.path.exists(theme_path):
             try:
                 with open(theme_path, "r", encoding="utf-8") as f:
@@ -383,8 +388,6 @@ class MikuCalendarApp:
     def switch_theme(self):
         self.current_theme_index = (self.current_theme_index + 1) % len(self.available_themes)
         new_theme = self.available_themes[self.current_theme_index]
-        print(f"Switching to theme: {new_theme['name']}")
-
         global DEFAULT_THEME, MIKU_TEAL, MIKU_PINK, MIKU_DARK
         DEFAULT_THEME.update(new_theme)
         MIKU_TEAL = DEFAULT_THEME["accent_teal"]
@@ -398,51 +401,51 @@ class MikuCalendarApp:
         self.refresh_calendar()
 
     def create_widgets(self):
-        self.anim_frame = tk.Frame(self.root, height=340, bg=MIKU_DARK)
-        self.anim_frame.pack(fill=tk.X, padx=12, pady=(12, 8))
+        self.anim_frame = tk.Frame(self.root, height=270, bg=MIKU_DARK)
+        self.anim_frame.pack(fill=tk.X, padx=10, pady=(8, 5))
         self.anim_frame.pack_propagate(False)
         self.animator = Miku3DAnimator(self.anim_frame)
 
         main_container = tk.Frame(self.root, bg=DEFAULT_THEME["bg_panel"])
-        main_container.pack(fill=tk.BOTH, expand=True, padx=12, pady=8)
+        main_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
 
-        cal_frame = tk.LabelFrame(main_container, text=" MIKU CALENDAR ", fg=DEFAULT_THEME["btn_fg"], font=("Arial", 12, "bold"), bg=DEFAULT_THEME["bg_panel"])
-        cal_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 8))
+        cal_frame = tk.LabelFrame(main_container, text=" MIKU CALENDAR ", fg=DEFAULT_THEME["btn_fg"], font=("Arial", 10, "bold"), bg=DEFAULT_THEME["bg_panel"])
+        cal_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 6))
 
         nav_frame = tk.Frame(cal_frame, bg=DEFAULT_THEME["bg_panel"])
-        nav_frame.pack(fill=tk.X, pady=10)
+        nav_frame.pack(fill=tk.X, pady=6)
 
-        tk.Button(nav_frame, text="◀ Prev", command=self.prev_month, bg=DEFAULT_THEME["btn_bg"], fg=DEFAULT_THEME["btn_fg"]).pack(side=tk.LEFT, padx=10)
-        self.month_label = tk.Label(nav_frame, text="", font=("Arial", 18, "bold"), fg=DEFAULT_THEME["btn_fg"], bg=DEFAULT_THEME["bg_panel"])
+        tk.Button(nav_frame, text="◀ Prev", command=self.prev_month, bg=DEFAULT_THEME["btn_bg"], fg=DEFAULT_THEME["btn_fg"], font=("Arial", 8)).pack(side=tk.LEFT, padx=5)
+        self.month_label = tk.Label(nav_frame, text="", font=("Arial", 14, "bold"), fg=DEFAULT_THEME["btn_fg"], bg=DEFAULT_THEME["bg_panel"])
         self.month_label.pack(side=tk.LEFT, expand=True)
-        tk.Button(nav_frame, text="Next ▶", command=self.next_month, bg=DEFAULT_THEME["btn_bg"], fg=DEFAULT_THEME["btn_fg"]).pack(side=tk.RIGHT, padx=10)
+        tk.Button(nav_frame, text="Next ▶", command=self.next_month, bg=DEFAULT_THEME["btn_bg"], fg=DEFAULT_THEME["btn_fg"], font=("Arial", 8)).pack(side=tk.RIGHT, padx=5)
 
         self.cal_canvas = tk.Canvas(cal_frame, bg=DEFAULT_THEME["btn_bg"], highlightthickness=0)
-        self.cal_canvas.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        self.cal_canvas.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        side_frame = tk.Frame(main_container, width=340, bg=DEFAULT_THEME["bg_panel"])
-        side_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=(8, 0))
+        side_frame = tk.Frame(main_container, width=280, bg=DEFAULT_THEME["bg_panel"])
+        side_frame.pack(side=tk.RIGHT, fill=tk.Y, padx=(6, 0))
         side_frame.pack_propagate(False)
 
-        self.quote_label = tk.Label(side_frame, text="", wraplength=300, fg="#bae6fd", bg=DEFAULT_THEME["btn_bg"], font=("Arial", 10, "italic"), height=5)
-        self.quote_label.pack(fill=tk.X, padx=10, pady=10)
+        self.quote_label = tk.Label(side_frame, text="", wraplength=260, fg="#bae6fd", bg=DEFAULT_THEME["btn_bg"], font=("Arial", 9, "italic"), height=3)
+        self.quote_label.pack(fill=tk.X, padx=6, pady=6)
 
-        self.events_text = tk.Text(side_frame, bg="#0f172a", fg="#bae6fd", font=("Courier New", 10), wrap="word")
-        self.events_text.pack(fill=tk.BOTH, expand=True, padx=8, pady=8)
+        self.events_text = tk.Text(side_frame, bg="#0f172a", fg="#bae6fd", font=("Courier New", 9), wrap="word")
+        self.events_text.pack(fill=tk.BOTH, expand=True, padx=5, pady=5)
 
         ctrl_frame = tk.Frame(self.root, bg=MIKU_DARK)
-        ctrl_frame.pack(fill=tk.X, padx=12, pady=10)
+        ctrl_frame.pack(fill=tk.X, padx=10, pady=6)
         
-        # Add the Theme Switcher Button
         self.theme_btn = tk.Button(ctrl_frame, 
                                    text=f"🎭 THEME: {DEFAULT_THEME['name'].upper()}", 
                                    command=self.switch_theme, 
                                    bg=DEFAULT_THEME["btn_bg"], 
-                                   fg=DEFAULT_THEME["btn_fg"])
-        self.theme_btn.pack(side=tk.LEFT, padx=5)
+                                   fg=DEFAULT_THEME["btn_fg"],
+                                   font=("Arial", 8))
+        self.theme_btn.pack(side=tk.LEFT, padx=4)
 
-        tk.Button(ctrl_frame, text="🗓 TODAY", command=self.go_today, bg=DEFAULT_THEME["btn_bg"], fg=DEFAULT_THEME["btn_fg"]).pack(side=tk.LEFT, padx=5)
-        self.leek_btn = tk.Button(ctrl_frame, text="🌱 LEEK MODE", command=self.toggle_leek, bg=DEFAULT_THEME["btn_bg"], fg=MIKU_PINK).pack(side=tk.LEFT, padx=5)
+        tk.Button(ctrl_frame, text="🗓 TODAY", command=self.go_today, bg=DEFAULT_THEME["btn_bg"], fg=DEFAULT_THEME["btn_fg"], font=("Arial", 8)).pack(side=tk.LEFT, padx=4)
+        self.leek_btn = tk.Button(ctrl_frame, text="🌱 LEEK MODE", command=self.toggle_leek, bg=DEFAULT_THEME["btn_bg"], fg=MIKU_PINK, font=("Arial", 8)).pack(side=tk.LEFT, padx=4)
         
         self.update_miku_quote()
 
@@ -459,7 +462,7 @@ class MikuCalendarApp:
 
         for col, day in enumerate(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]):
             tk.Label(self.cal_canvas, text=day, bg=DEFAULT_THEME["btn_bg"], 
-                     fg=MIKU_PINK, font=("Arial", 10, "bold")).grid(row=0, column=col, sticky="nsew")
+                     fg=MIKU_PINK, font=("Arial", 8, "bold")).grid(row=0, column=col, sticky="nsew")
 
         for r, week in enumerate(cal, 1):
             for c, day_num in enumerate(week):
@@ -468,8 +471,8 @@ class MikuCalendarApp:
                 bg = DEFAULT_THEME["btn_active_bg"] if d_obj == today else DEFAULT_THEME["btn_bg"]
                 
                 f = tk.Frame(self.cal_canvas, bg=bg, relief=tk.RAISED, bd=1)
-                f.grid(row=r, column=c, sticky="nsew", padx=2, pady=2)
-                tk.Label(f, text=str(day_num), bg=bg, fg="white").pack()
+                f.grid(row=r, column=c, sticky="nsew", padx=1, pady=1)
+                tk.Label(f, text=str(day_num), bg=bg, fg="white", font=("Arial", 8)).pack()
                 f.bind("<Button-1>", lambda e, d=d_obj: self.open_day_editor(d))
 
         for i in range(7): self.cal_canvas.grid_columnconfigure(i, weight=1)
@@ -493,14 +496,14 @@ class MikuCalendarApp:
         key = date_obj.isoformat()
         pop = tk.Toplevel(self.root)
         pop.title(f"Event: {key}")
-        pop.geometry("320x280")
+        pop.geometry("300x250")
         pop.configure(bg=DEFAULT_THEME["bg_panel"])
         
-        tk.Label(pop, text=f"Manage Event for {key}", fg=MIKU_PINK, bg=DEFAULT_THEME["bg_panel"], font=("Arial", 10, "bold")).pack(pady=10)
+        tk.Label(pop, text=f"Manage Event for {key}", fg=MIKU_PINK, bg=DEFAULT_THEME["bg_panel"], font=("Arial", 9, "bold")).pack(pady=8)
         
-        tk.Label(pop, text="Event Title:", fg="white", bg=DEFAULT_THEME["bg_panel"]).pack()
+        tk.Label(pop, text="Event Title:", fg="white", bg=DEFAULT_THEME["bg_panel"], font=("Arial", 8)).pack()
         ent = tk.Entry(pop, bg="#1e2937", fg="white", insertbackground="white")
-        ent.pack(pady=5, padx=20, fill=tk.X)
+        ent.pack(pady=4, padx=15, fill=tk.X)
         
         if key in self.events:
             ent.insert(0, self.events[key][0]['title'])
@@ -521,20 +524,20 @@ class MikuCalendarApp:
                 pop.destroy()
 
         btn_frame = tk.Frame(pop, bg=DEFAULT_THEME["bg_panel"])
-        btn_frame.pack(pady=20)
+        btn_frame.pack(pady=15)
 
-        tk.Button(btn_frame, text=" SAVE ", command=save, bg="#059669", fg="white").pack(side=tk.LEFT, padx=5)
+        tk.Button(btn_frame, text=" SAVE ", command=save, bg="#059669", fg="white", font=("Arial", 8)).pack(side=tk.LEFT, padx=4)
         if key in self.events:
-            tk.Button(btn_frame, text=" DELETE ", command=delete_ev, bg="#dc2626", fg="white").pack(side=tk.LEFT, padx=5)
+            tk.Button(btn_frame, text=" DELETE ", command=delete_ev, bg="#dc2626", fg="white", font=("Arial", 8)).pack(side=tk.LEFT, padx=4)
         
-        tk.Button(btn_frame, text="CANCEL", command=pop.destroy, bg="#4b5563", fg="white").pack(side=tk.LEFT, padx=5)
+        tk.Button(btn_frame, text="CANCEL", command=pop.destroy, bg="#4b5563", fg="white", font=("Arial", 8)).pack(side=tk.LEFT, padx=4)
 
     def refresh_upcoming_events(self):
         self.events_text.delete("1.0", tk.END)
         self.events_text.insert("1.0", "Upcoming:\n" + "\n".join([f"{k}: {v[0]['title']}" for k,v in self.events.items()][:10]))
 
     def update_miku_quote(self):
-        self.quote_label.config(text=random.choice(["Sing with me!", "Leeks are great!", "Let's go!"]))
+        self.quote_label.config(text=random.choice(["Sing with me!", "Leeks are great!", "Let's go!", "Miku Miku!", "Be happy!"]))
         self.root.after(10000, self.update_miku_quote)
 
     def toggle_leek(self):

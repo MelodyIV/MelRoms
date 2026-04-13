@@ -47,6 +47,13 @@ class MikuPinger:
         self.create_widgets()
         self.setup_logging_tags()
         self.apply_styles()
+        try:
+            base_dir = os.path.dirname(__file__)
+            icon_path = os.path.join(base_dir, "icon.ico")
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"Icon failed to load: {e}")
 
     def create_widgets(self):
         self.main_frame = tk.Frame(self.root, bg=MikuTheme.DARK)
@@ -192,6 +199,8 @@ class MikuPinger:
     def on_closing(self):
         self.stop_ping = True
         self.root.destroy()
+
+
 
 if __name__ == "__main__":
     root = tk.Tk()

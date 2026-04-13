@@ -127,6 +127,13 @@ class MelRomsClock:
 
         self.setup_ui()
         self.update_loop()
+        try:
+            base_dir = os.path.dirname(__file__)
+            icon_path = os.path.join(base_dir, "icon.ico")
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"Icon failed to load: {e}")
 
     def setup_ui(self):
         left = tk.Frame(self.root, bg=THEME["bg"])

@@ -54,6 +54,13 @@ class AESCuteObfuscator:
         self.label_font = font.Font(family="Segoe UI", size=9)
         self.btn_font = font.Font(family="Segoe UI", size=10, weight="bold")
         self.setup_ui()
+        try:
+            base_dir = os.path.dirname(__file__)
+            icon_path = os.path.join(base_dir, "icon.ico")
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"Icon failed to load: {e}")
 
     def setup_ui(self):
         tk.Label(self.root, text="✨ AES Scrambler ✨", font=self.title_font,

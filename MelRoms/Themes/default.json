@@ -1,4 +1,4 @@
-DEFAULT_THEME = {
+{
     "name": "Dark MelRoms",
     "bg_root": "#111111",
     "bg_panel": "#111111",
@@ -19,9 +19,9 @@ DEFAULT_THEME = {
     "info_frame_fg": "#00FFCC",
     "info_text_bg": "#080808",
     "info_text_fg": "#BBBBBB",
-    "slider_bg": "#222222",      # new: slider background
-    "slider_trough": "#333333",   # new: slider trough color
-    "slider_slider": "#00FFCC",   # new: slider handle color
+    "slider_bg": "#222222",      
+    "slider_trough": "#333333",  
+    "slider_slider": "#00FFCC",  
     "font_main": ["Arial", 9, "bold"],
     "font_mono": ["Courier New", 9]
 }

@@ -1,0 +1,49 @@
+Effective Date: April 13, 2026
+Last Updated: April 13, 2026
+
+Welcome to MelRoms (“the Software”, “we”, “us”, or “our”). By downloading, installing, or using any part of the MelRoms suite (including but not limited to the Module Editor, Saturn AI Chat, AES Scrambler/Unscrambler, Miku System Monitor, Lag Switch, MelRoms Clock, Calendar, Pinger, Tetris, Pong, Color Picker, and any associated scripts or binaries), you agree to be bound by these Terms of Service (“Terms”).
+
+If you do not agree to these Terms, do not install or use the Software.
+
+1. License & Use
+Personal, Non‑Commercial License – You are granted a limited, revocable, non‑exclusive, non‑transferable license to use the Software for personal, educational, or internal testing purposes only.
+
+No Redistribution – You may not sell, license, sublicense, rent, lease, or redistribute the Software or any derivative works without explicit written permission from the author.
+
+Modifications – You may modify the source code for personal use.
+
+AI Features – The Saturn AI chat uses an Ollama‑powered local model (Gemma3). No data is sent to external servers unless you explicitly install an online model. The Software does not transmit your code or chat history over the internet (except optional Discord Rich Presence, which only shares anonymised metadata – see Privacy Policy).
+
+2. Prohibited Activities
+You agree not to:
+
+Use the Software for any illegal purpose or in violation of any local, state, national, or international law.
+
+Use the Lag Switch, network tools, or system monitor to attack, disrupt, or gain unauthorised access to any computer network, service, or device.
+
+Use the AES obfuscation tools to conceal malware, ransomware, or any malicious payload.
+
+Reverse engineer, decompile, or disassemble the Software beyond what is allowed by applicable law.
+
+Remove or alter any proprietary notices or labels.
+
+3. No Warranty
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+4. Limitation of Liability
+To the maximum extent permitted by law, the MelRoms authors and contributors shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or data, whether in an action of contract, warranty, tort (including negligence), or otherwise, even if advised of the possibility of such damages.
+
+5. Third‑Party Components
+The Software may incorporate third‑party libraries (e.g., pygame, pydivert, psutil, pypresence, ollama, pygments, Crypto, etc.). These are subject to their own licenses. You agree to comply with the terms of those licenses when using the Software.
+
+6. Termination
+We may suspend or terminate your access to the Software at any time, with or without cause, with or without notice, effective immediately. Upon termination, you must cease all use of the Software and delete all copies.
+
+7. Governing Law
+These Terms shall be governed and construed in accordance with the laws of your jurisdiction of residence, without regard to its conflict of law provisions.
+
+8. Changes to Terms
+We reserve the right to modify these Terms at any time. Continued use of the Software after any such changes constitutes your acceptance of the new Terms.
+
+9. Contact
+For questions about these Terms, please open an issue on the official MelRoms repository or contact via the project’s designated channel.

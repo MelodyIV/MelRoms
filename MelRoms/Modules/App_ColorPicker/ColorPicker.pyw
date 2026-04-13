@@ -1,4 +1,5 @@
 import tkinter as tk
+import os
 from tkinter import messagebox
 import pyautogui
 from PIL import Image, ImageTk
@@ -38,6 +39,13 @@ class ColorPickerApp:
         self.root.resizable(True, True)
 
         self.current_rgb = (255, 255, 255)
+        try:
+            base_dir = os.path.dirname(__file__)
+            icon_path = os.path.join(base_dir, "icon.ico")
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"Icon failed to load: {e}")
 
         self._setup_ui()
 

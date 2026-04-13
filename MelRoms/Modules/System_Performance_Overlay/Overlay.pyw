@@ -5,7 +5,6 @@ import sys
 import time
 import threading
 import subprocess
-import time
 from datetime import datetime
 
 try:
@@ -31,6 +30,7 @@ try:
     PING_AVAILABLE = True
 except ImportError:
     PING_AVAILABLE = False
+
 try:
     import GPUtil
     GPUTIL_AVAILABLE = True
@@ -42,11 +42,11 @@ try:
     PYADL_AVAILABLE = True
 except ImportError:
     PYADL_AVAILABLE = False
+
 BG_DARK = "#0a0e17"
 FG_CYAN = "#00e5ff"
 FG_PURPLE = "#b77cff"
 BG_PANEL = "#111520"
-
 
 def get_gpu_usage():
     try:
@@ -78,12 +78,11 @@ def get_gpu_usage():
 
     return None
 
-
 class MikuOverlay:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Miku System Monitor")
-        self.root.geometry("280x185")
+        self.root.geometry("260x175")
         self.root.configure(bg=BG_DARK)
         self.root.overrideredirect(True)
         self.root.attributes('-topmost', True)
@@ -98,10 +97,7 @@ class MikuOverlay:
         self.last_net_recv = 0
         self.last_net_time = 0
         self.gpu_available = get_gpu_usage() is not None
-        if self.gpu_available:
-            print("GPU detected")
-        else:
-            print("No compatible GPU found")
+        self.running = True
 
         self.create_widgets()
         self.setup_drag()
@@ -111,53 +107,69 @@ class MikuOverlay:
 
     def create_widgets(self):
         main = tk.Frame(self.root, bg=BG_DARK)
-        main.pack(fill=tk.BOTH, expand=True, padx=10, pady=8)
+        main.pack(fill=tk.BOTH, expand=True, padx=8, pady=6)
+
         title_bar = tk.Frame(main, bg=BG_PANEL, height=20)
-        title_bar.pack(fill=tk.X, pady=(0, 6))
+        title_bar.pack(fill=tk.X, pady=(0, 5))
         title_bar.pack_propagate(False)
+
         drag_area = tk.Frame(title_bar, bg=BG_PANEL)
         drag_area.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
         drag_area.bind("<Button-1>", self.start_move)
         drag_area.bind("<B1-Motion>", self.on_move)
-        tk.Label(drag_area, text="⚡", bg=BG_PANEL, fg=FG_CYAN, font=("Consolas", 10)).pack(side=tk.LEFT, padx=5)
-        tk.Label(drag_area, text="MONITOR", bg=BG_PANEL, fg=FG_PURPLE, font=("Consolas", 8, "bold")).pack(side=tk.LEFT)
-        close_btn = tk.Label(title_bar, text="✕", bg=BG_PANEL, fg=FG_PURPLE, font=("Consolas", 10, "bold"))
-        close_btn.pack(side=tk.RIGHT, padx=5)
+
+        tk.Label(drag_area, text="⚡", bg=BG_PANEL, fg=FG_CYAN, font=("Consolas", 9)).pack(side=tk.LEFT, padx=4)
+        tk.Label(drag_area, text="MONITOR", bg=BG_PANEL, fg=FG_PURPLE, font=("Consolas", 7, "bold")).pack(side=tk.LEFT)
+
+        close_btn = tk.Label(title_bar, text="✕", bg=BG_PANEL, fg=FG_PURPLE, font=("Consolas", 9, "bold"))
+        close_btn.pack(side=tk.RIGHT, padx=4)
         close_btn.bind("<Button-1>", lambda e: self.quit())
-        close_btn.bind("<Button-1>", lambda e: None, add="+") 
-        self.cpu_label = tk.Label(main, text="CPU: --%", bg=BG_DARK, fg=FG_CYAN, font=("Consolas", 9), anchor="w")
+
+        self.cpu_label = tk.Label(main, text="CPU: --%", bg=BG_DARK, fg=FG_CYAN, font=("Consolas", 8), anchor="w")
         self.cpu_label.pack(fill=tk.X, pady=1)
-        self.top_cpu_label = tk.Label(main, text="TOP: --", bg=BG_DARK, fg=FG_PURPLE, font=("Consolas", 8), anchor="w")
+
+        self.top_cpu_label = tk.Label(main, text="TOP: --", bg=BG_DARK, fg=FG_PURPLE, font=("Consolas", 7), anchor="w")
         self.top_cpu_label.pack(fill=tk.X, pady=1)
-        self.ram_label = tk.Label(main, text="RAM: -- / -- GB", bg=BG_DARK, fg=FG_CYAN, font=("Consolas", 9), anchor="w")
+
+        self.ram_label = tk.Label(main, text="RAM: -- / -- GB", bg=BG_DARK, fg=FG_CYAN, font=("Consolas", 8), anchor="w")
         self.ram_label.pack(fill=tk.X, pady=1)
+
         if self.gpu_available:
-            self.gpu_label = tk.Label(main, text="GPU: --%", bg=BG_DARK, fg=FG_CYAN, font=("Consolas", 9), anchor="w")
+            self.gpu_label = tk.Label(main, text="GPU: --%", bg=BG_DARK, fg=FG_CYAN, font=("Consolas", 8), anchor="w")
             self.gpu_label.pack(fill=tk.X, pady=1)
-        self.net_label = tk.Label(main, text="NET: ↓-- ↑--", bg=BG_DARK, fg=FG_CYAN, font=("Consolas", 9), anchor="w")
+
+        self.net_label = tk.Label(main, text="NET: ↓-- ↑--", bg=BG_DARK, fg=FG_CYAN, font=("Consolas", 8), anchor="w")
         self.net_label.pack(fill=tk.X, pady=1)
-        self.ping_label = tk.Label(main, text="PING: -- ms", bg=BG_DARK, fg=FG_CYAN, font=("Consolas", 9), anchor="w")
+
+        self.ping_label = tk.Label(main, text="PING: -- ms", bg=BG_DARK, fg=FG_CYAN, font=("Consolas", 8), anchor="w")
         self.ping_label.pack(fill=tk.X, pady=1)
-        self.status_label = tk.Label(main, text="● ACTIVE", bg=BG_DARK, fg=FG_PURPLE, font=("Consolas", 8))
-        self.status_label.pack(pady=(4, 0))
+
+        self.status_label = tk.Label(main, text="● ACTIVE", bg=BG_DARK, fg=FG_PURPLE, font=("Consolas", 7))
+        self.status_label.pack(pady=(3, 0))
+
         self.menu = tk.Menu(self.root, tearoff=0, bg=BG_PANEL, fg=FG_CYAN)
         self.menu.add_command(label="Toggle (Ctrl+H)", command=self.toggle_visibility)
         self.menu.add_command(label="Set Target Game...", command=self.set_target_dialog)
         self.menu.add_separator()
         self.menu.add_command(label="Exit", command=self.quit)
         self.root.bind("<Button-3>", self.show_menu)
+
     def setup_drag(self):
         self.drag_x = 0
         self.drag_y = 0
+
     def start_move(self, event):
         self.drag_x = event.x
         self.drag_y = event.y
+
     def on_move(self, event):
         x = self.root.winfo_x() + (event.x - self.drag_x)
         y = self.root.winfo_y() + (event.y - self.drag_y)
         self.root.geometry(f"+{x}+{y}")
+
     def setup_hotkey(self):
         self.root.bind("<Control-h>", lambda e: self.toggle_visibility())
+
     def toggle_visibility(self):
         if self.visible:
             self.root.withdraw()
@@ -165,20 +177,24 @@ class MikuOverlay:
         else:
             self.root.deiconify()
             self.visible = True
+
     def show_menu(self, event):
         self.menu.post(event.x_root, event.y_root)
+
     def set_target_dialog(self):
         dialog = tk.Toplevel(self.root)
         dialog.title("Target Game")
-        dialog.geometry("300x120")
+        dialog.geometry("280x110")
         dialog.configure(bg=BG_DARK)
         dialog.transient(self.root)
         dialog.grab_set()
-        tk.Label(dialog, text="Window title (partial):", bg=BG_DARK, fg=FG_CYAN).pack(pady=10)
-        entry = tk.Entry(dialog, bg="#1a1f2a", fg="white", width=30)
-        entry.pack(pady=5)
+
+        tk.Label(dialog, text="Window title (partial):", bg=BG_DARK, fg=FG_CYAN, font=("Arial", 9)).pack(pady=8)
+        entry = tk.Entry(dialog, bg="#1a1f2a", fg="white", width=28)
+        entry.pack(pady=4)
         if self.target_process:
             entry.insert(0, self.target_process)
+
         def save():
             self.target_process = entry.get().strip() or None
             dialog.destroy()
@@ -186,12 +202,18 @@ class MikuOverlay:
                 self.status_label.config(text=f"🎯 {self.target_process[:12]}")
             else:
                 self.status_label.config(text="● ACTIVE")
-        tk.Button(dialog, text="Save", command=save, bg=BG_PANEL, fg=FG_CYAN).pack(pady=10)
+
+        tk.Button(dialog, text="Save", command=save, bg=BG_PANEL, fg=FG_CYAN, font=("Arial", 8)).pack(pady=8)
+
     def is_target_running(self):
         if not self.target_process or not gw:
             return True
-        windows = gw.getWindowsWithTitle(self.target_process)
-        return len(windows) > 0
+        try:
+            windows = gw.getWindowsWithTitle(self.target_process)
+            return len(windows) > 0
+        except:
+            return True
+
     def get_top_cpu_process(self):
         try:
             processes = []
@@ -209,6 +231,7 @@ class MikuOverlay:
             return "System Idle", 0.0
         except Exception:
             return "Error", 0.0
+
     def get_network_speeds(self):
         net = psutil.net_io_counters()
         now = time.time()
@@ -226,50 +249,62 @@ class MikuOverlay:
         self.last_net_recv = net.bytes_recv
         self.last_net_time = now
         return sent_rate, recv_rate
+
     def update_stats(self):
         def background_update():
             last_top_update = 0
             top_name = "Idle"
             top_cpu = 0.0
 
-            while True:
+            while self.running:
                 if not self.visible or not self.is_target_running():
                     time.sleep(1)
                     continue
+
                 raw_cpu = psutil.cpu_percent(interval=0.3)
                 cpu_normalized = raw_cpu
                 mem = psutil.virtual_memory()
                 ram_used = mem.used / (1024**3)
                 ram_total = mem.total / (1024**3)
+
                 now = time.time()
                 if now - last_top_update >= 2.0:
                     top_name, top_cpu = self.get_top_cpu_process()
                     last_top_update = now
-                gpu_str = ""
+
+                gpu_load = None
                 if self.gpu_available:
                     gpu_load = get_gpu_usage()
-                    if gpu_load is not None:
-                        gpu_str = f"GPU: {gpu_load}%"
-                    else:
-                        gpu_str = "GPU: N/A"
+
                 up_kb, down_kb = self.get_network_speeds()
                 net_str = f"NET: ↓{down_kb:.0f} ↑{up_kb:.0f} KB/s"
+
                 if PING_AVAILABLE and int(now) % 3 < 1:
                     ping_ms = ping(self.ping_target, timeout=0.8)
-                    self.last_ping = int(ping_ms * 1000) if ping_ms else self.last_ping
+                    if ping_ms:
+                        self.last_ping = int(ping_ms * 1000)
+
                 ping_text = f"{self.last_ping} ms" if self.last_ping else "N/A"
+
+                # Schedule UI updates (use after_idle to avoid conflicts)
                 self.root.after(0, lambda c=cpu_normalized: self.cpu_label.config(text=f"CPU: {c:.1f}%"))
                 self.root.after(0, lambda n=top_name, c=top_cpu: self.top_cpu_label.config(text=f"TOP: {n} ({c:.1f}%)"))
                 self.root.after(0, lambda u=ram_used, t=ram_total: self.ram_label.config(text=f"RAM: {u:.1f} / {t:.1f} GB"))
-                if self.gpu_available:
-                    self.root.after(0, lambda g=gpu_str: self.gpu_label.config(text=g))
+                if self.gpu_available and hasattr(self, 'gpu_label'):
+                    gpu_text = f"GPU: {gpu_load}%" if gpu_load is not None else "GPU: N/A"
+                    self.root.after(0, lambda g=gpu_text: self.gpu_label.config(text=g))
                 self.root.after(0, lambda n=net_str: self.net_label.config(text=n))
                 self.root.after(0, lambda p=ping_text: self.ping_label.config(text=f"PING: {p}"))
+
                 time.sleep(0.8)
+
         thread = threading.Thread(target=background_update, daemon=True)
         thread.start()
+
     def quit(self):
+        self.running = False
         self.root.destroy()
         sys.exit(0)
+
 if __name__ == "__main__":
     app = MikuOverlay()

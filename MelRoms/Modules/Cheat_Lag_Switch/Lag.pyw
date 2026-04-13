@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 import time
 import threading
 import random
@@ -55,6 +56,13 @@ class MelRomsLagSwitch:
 
         self.create_widgets()
         self.update_loop()
+        try:
+            base_dir = os.path.dirname(__file__)
+            icon_path = os.path.join(base_dir, "icon.ico")
+            if os.path.exists(icon_path):
+                self.root.iconbitmap(icon_path)
+        except Exception as e:
+            print(f"Icon failed to load: {e}")
 
     def create_widgets(self):
         main = tk.Frame(self.root, bg=MIKU_DARK)

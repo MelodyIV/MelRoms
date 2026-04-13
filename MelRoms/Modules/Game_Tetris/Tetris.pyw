@@ -2,29 +2,36 @@ import pygame
 import random
 import math
 import sys
+
 MIKU_TEAL = (57, 197, 187)
 MIKU_PINK = (255, 106, 170)
 DARK_BLUE = (5, 5, 20)
 WHITE = (200, 255, 250)
 colors = [(0,0,0), MIKU_PINK, MIKU_TEAL, (100,100,255), (150,50,255), MIKU_TEAL, MIKU_PINK]
+
 FOV, OFFSET_X, OFFSET_Y = 400, 225, 300
+
 def project_3d(x, y, z):
     factor = FOV / (z + 500)
     return x * factor + OFFSET_X, y * factor + OFFSET_Y
+
 def draw_wireframe_cube(screen, x, y, z, size, color, thickness=1):
     s = size / 2
     pts = [(x-s,y-s,z-s), (x+s,y-s,z-s), (x+s,y+s,z-s), (x-s,y+s,z-s),
            (x-s,y-s,z+s), (x+s,y-s,z+s), (x+s,y+s,z+s), (x-s,y+s,z+s)]
     proj = [project_3d(p[0], p[1], p[2]) for p in pts]
     edges = [(0,1),(1,2),(2,3),(3,0),(4,5),(5,6),(6,7),(7,4),(0,4),(1,5),(2,6),(3,7)]
-    for e in edges: pygame.draw.line(screen, color, proj[e[0]], proj[e[1]], thickness)
+    for e in edges:
+        pygame.draw.line(screen, color, proj[e[0]], proj[e[1]], thickness)
+
 class SoundEngine:
     def __init__(self):
         try:
             pygame.mixer.init(frequency=22050, size=-8, channels=1)
         except:
             pass
-    def _generate_sine(self, freq, dur, volume=0.7, fade=True):
+
+    def _generate_sine(self, freq, dur, volume=0.1, fade=True):
         sample_rate = 22050
         n_samples = int(sample_rate * dur)
         buf = bytearray()
@@ -38,6 +45,7 @@ class SoundEngine:
             int_val = int(128 + val * volume * envelope)
             buf.append(max(0, min(255, int_val)))
         return buf
+
     def _play_buffer(self, buffer):
         try:
             pygame.mixer.Sound(buffer=buffer).play()
@@ -51,12 +59,13 @@ class SoundEngine:
         buf = bytearray()
         for i in range(n_samples):
             t = i / sample_rate
-            freq = 100 - 50 * (t / dur) 
+            freq = 100 - 50 * (t / dur)
             val = math.sin(2 * math.pi * freq * t)
             envelope = math.exp(-15 * t)
-            int_val = int(128 + val * 0.7 * envelope)  
+            int_val = int(128 + val * 0.05 * envelope)   # reduced volume
             buf.append(max(0, min(255, int_val)))
         self._play_buffer(buf)
+
     def play_turn(self):
         sample_rate = 22050
         dur = 0.12
@@ -64,12 +73,13 @@ class SoundEngine:
         buf = bytearray()
         for i in range(n_samples):
             t = i / sample_rate
-            freq = 350 - 200 * (t / dur) 
+            freq = 350 - 200 * (t / dur)
             val = math.sin(2 * math.pi * freq * t)
             envelope = math.exp(-10 * t)
-            int_val = int(128 + val * 0.7 * envelope) 
+            int_val = int(128 + val * 0.05 * envelope)
             buf.append(max(0, min(255, int_val)))
         self._play_buffer(buf)
+
     def play_move(self):
         sample_rate = 22050
         dur = 0.1
@@ -84,7 +94,7 @@ class SoundEngine:
                 freq = 120 + 20 * math.sin(2 * math.pi * 4 * t)
                 val = math.sin(2 * math.pi * freq * t)
             envelope = math.exp(-12 * t)
-            int_val = int(128 + val * 0.7 * envelope)
+            int_val = int(128 + val * 0.12 * envelope)   # reduced volume
             buf.append(max(0, min(255, int_val)))
         self._play_buffer(buf)
 
@@ -97,7 +107,7 @@ class SoundEngine:
             t = i / sample_rate
             val = math.sin(2 * math.pi * 180 * t)
             envelope = math.exp(-10 * t)
-            int_val = int(128 + val * 0.7 * envelope)
+            int_val = int(128 + val * 0.12 * envelope)   # reduced volume
             buf.append(max(0, min(255, int_val)))
         self._play_buffer(buf)
 
@@ -127,14 +137,41 @@ class Tetris:
         self.score, self.state, self.zoom = 0, "start", 22
         self.figure, self.next_figure = None, Figure(3, 0)
         self.held_type, self.can_hold = None, True
-        self.lock_delay_timer = 0 
+        self.lock_delay_timer = 0
+        self.particles = []
+        self.flash_alpha = 0
+        self.flash_color = (0,0,0)
+
+    def add_particles(self, world_x, world_y, color, count=10, speed_range=(2,6)):
+        for _ in range(count):
+            angle = random.uniform(0, math.pi*2)
+            speed = random.uniform(*speed_range)
+            vx = math.cos(angle) * speed
+            vy = math.sin(angle) * speed
+            self.particles.append({
+                'pos': [world_x, world_y, random.uniform(-10,10)],
+                'vel': [vx, vy, random.uniform(-2,2)],
+                'life': 1.0,
+                'decay': random.uniform(0.02, 0.04),
+                'color': color
+            })
+
+    def update_particles(self):
+        for p in self.particles[:]:
+            p['pos'][0] += p['vel'][0]
+            p['pos'][1] += p['vel'][1]
+            p['pos'][2] += p['vel'][2]
+            p['life'] -= p['decay']
+            if p['life'] <= 0:
+                self.particles.remove(p)
 
     def new_figure(self):
         self.figure = self.next_figure
         self.next_figure = Figure(3, 0)
         self.can_hold = True
         self.lock_delay_timer = 0
-        if self.intersects(): self.state = "gameover"
+        if self.intersects():
+            self.state = "gameover"
 
     def intersects(self):
         for i in range(4):
@@ -152,33 +189,50 @@ class Tetris:
             for j in range(4):
                 if i * 4 + j in self.figure.image():
                     self.field[i + self.figure.y][j + self.figure.x] = self.figure.color
-        lines = 0
+        lines_cleared = 0
         for i in range(1, self.height):
             if 0 not in self.field[i]:
-                lines += 1
-                for i1 in range(i, 1, -1): self.field[i1] = self.field[i1-1][:]
-        self.score += lines ** 2
+                lines_cleared += 1
+                for i1 in range(i, 1, -1):
+                    self.field[i1] = self.field[i1-1][:]
+        if lines_cleared > 0:
+            self.score += lines_cleared ** 2
+            self.flash_alpha = 0.6
+            self.flash_color = MIKU_TEAL if lines_cleared < 3 else MIKU_PINK
+            # add particles on each cleared cell
+            for i in range(1, self.height):
+                if 0 not in self.field[i]:
+                    for j in range(self.width):
+                        if self.field[i][j] > 0:
+                            gx = (j - 5) * self.zoom
+                            gy = (i - 10) * self.zoom
+                            self.add_particles(gx, gy, colors[self.field[i][j]], count=5, speed_range=(1,4))
         self.new_figure()
 
     def go_space(self):
-        while not self.intersects(): self.figure.y += 1
+        while not self.intersects():
+            self.figure.y += 1
         self.figure.y -= 1
         self.freeze()
 
     def go_down(self):
         self.figure.y += 1
-        if self.intersects(): self.figure.y -= 1
-        else: self.lock_delay_timer = 0
+        if self.intersects():
+            self.figure.y -= 1
+        else:
+            self.lock_delay_timer = 0
 
     def go_side(self, dx):
         old_x = self.figure.x
         self.figure.x += dx
-        if self.intersects(): self.figure.x = old_x
+        if self.intersects():
+            self.figure.x = old_x
 
     def rotate(self):
         old_rot = self.figure.rotation
         self.figure.rotate()
-        if self.intersects(): self.figure.rotation = old_rot
+        if self.intersects():
+            self.figure.rotation = old_rot
 
 pygame.init()
 
@@ -198,13 +252,15 @@ counter = 0
 
 while True:
     dt = clock.tick(30)
-    if game.figure is None: game.new_figure()
-    
+    if game.figure is None:
+        game.new_figure()
+
     game.figure.y += 1
     if game.intersects():
         game.figure.y -= 1
         game.lock_delay_timer += dt
-        if game.lock_delay_timer >= 300: game.freeze()
+        if game.lock_delay_timer >= 300:
+            game.freeze()
     else:
         game.figure.y -= 1
         counter += 1
@@ -212,7 +268,9 @@ while True:
             game.go_down()
 
     for event in pygame.event.get():
-        if event.type == pygame.QUIT: pygame.quit(); sys.exit()
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_UP:
                 game.rotate()
@@ -239,14 +297,14 @@ while True:
                 game.can_hold = False
                 sfx.play_hold()
             if event.key == pygame.K_ESCAPE:
-                game.__init__(20, 10)
+                game = Tetris(20, 10)
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_DOWN:
                 pressing_down = False
 
     screen.fill(DARK_BLUE)
     sway = math.sin(pygame.time.get_ticks() * 0.002) * 10
-    
+
     def draw_mini_preview(f_type, x_off, label):
         lbl = pygame.font.SysFont('Courier', 18, True).render(label, True, WHITE)
         screen.blit(lbl, [x_off - 20, 50])
@@ -274,13 +332,29 @@ while True:
             else:
                 p = project_3d(gx, gy, 0)
                 pygame.draw.circle(screen, (30, 35, 60), p, 1)
-    
+
     if game.figure:
         for i in range(4):
             for j in range(4):
                 if i*4+j in game.figure.image():
                     fx, fy = (j+game.figure.x-5)*game.zoom + sway, (i+game.figure.y-10)*game.zoom
                     draw_wireframe_cube(screen, fx, fy, 0, game.zoom, active_color, 2)
+
+    # draw particles
+    for p in game.particles:
+        screen_pos = project_3d(p['pos'][0], p['pos'][1], p['pos'][2])
+        alpha = int(255 * p['life'])
+        color = (p['color'][0], p['color'][1], p['color'][2])
+        size = int(4 * p['life'] + 1)
+        pygame.draw.circle(screen, color, (int(screen_pos[0]), int(screen_pos[1])), size)
+
+    # screen flash
+    if game.flash_alpha > 0:
+        flash_surf = pygame.Surface((450, 600))
+        flash_surf.set_alpha(int(game.flash_alpha * 255))
+        flash_surf.fill(game.flash_color)
+        screen.blit(flash_surf, (0, 0))
+        game.flash_alpha -= 0.03
 
     score_txt = pygame.font.SysFont('Courier', 22, True).render(f"SCORE: {game.score}", True, MIKU_TEAL)
     screen.blit(score_txt, [10, 10])
@@ -289,4 +363,5 @@ while True:
         over = pygame.font.SysFont('Courier', 40, True).render("SYSTEM FAIL", True, MIKU_PINK)
         screen.blit(over, [90, 250])
 
+    game.update_particles()
     pygame.display.flip()

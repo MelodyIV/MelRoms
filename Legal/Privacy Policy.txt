@@ -1,0 +1,71 @@
+Effective Date: April 13, 2026
+Last Updated: April 13, 2026
+
+This Privacy Policy explains how MelRoms (“we”, “us”, or “our”) handles your information when you use our software suite.
+
+1. Data Collection – What We Do NOT Collect
+MelRoms is designed with privacy first. By default, the Software:
+
+Does not collect any personal identifiable information (PII).
+
+Does not send any telemetry, analytics, or usage statistics.
+
+Does not access your files without your explicit action (e.g., you open a file in the editor, you upload a ZIP to the chat).
+
+Does not transmit your code, documents, or any content over the internet.
+
+Does not use cloud services for AI – the Saturn chat uses a local Ollama model (Gemma3) that runs entirely on your machine.
+
+2. Local Data Storage
+The Software stores the following data locally on your device only:
+
+Editor session (editor_session.json) – remembers which files you had open, for convenience.
+
+Calendar events (miku_calendar_data.json, Events/ folder) – stores your events, titles, and optional descriptions.
+
+Themes (.json files inside the Themes/ folder) – custom UI themes you create or download.
+
+AES‑encrypted stubs – when you use the AES Scrambler, the obfuscated output file is saved where you choose.
+
+This data never leaves your computer. You may delete these files at any time.
+
+3. Optional Features That May Exchange Data
+Discord Rich Presence (RPC)
+If you enable Discord Rich Presence (the pypresence library is installed and you set a valid Discord Application ID), the Software will send anonymous metadata to Discord, such as:
+
+The name of the file you are editing (e.g., “main.py”).
+
+The programming language (Python, Lua, Text).
+
+Your cursor position (line & column) and total character count.
+
+How long you have had the file open (elapsed time).
+
+No code content, no personal identifiers, and no other activity is shared. You can disable this feature by removing the pypresence library or setting a dummy Client ID.
+
+Ollama / AI Chat
+The Saturn chat uses a local Ollama instance. No text you type, no code, and no ZIP contents are ever sent to any external server. The AI model runs on your own GPU/CPU.
+
+Network Monitoring (Lag Switch, Pinger)
+The Lag Switch and Pinger tools capture network packets only on your local machine using pydivert (Windows) or ping. They do not send any captured data to us or to any third party.
+
+System Monitor Overlay
+The overlay reads system metrics (CPU, RAM, GPU, network, ping) locally using psutil and nvidia-smi. None of this data is transmitted.
+
+4. Third‑Party Services
+The Software does not integrate with any external analytics, advertising, or tracking services. The only network connections made are those you explicitly initiate (e.g., running a ping command, or using Discord RPC if enabled).
+
+5. Children’s Privacy
+The Software is not directed to children under 13. We do not knowingly collect personal information from children. If you believe a child has provided us with personal information, please contact us so we can delete it.
+
+6. Security
+We take reasonable measures to protect the locally stored data (e.g., session files, events). However, no method of electronic storage is 100% secure. You are responsible for securing your own system.
+
+7. Changes to this Policy
+We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy in the software repository and updating the “Effective Date” at the top.
+
+8. Your Rights
+Because we do not collect any personal data, there is no data to access, correct, delete, or port. However, you may delete all local configuration files (session, events, themes) at any time without affecting the functionality of the Software.
+
+9. Contact
+For privacy‑related questions, please open an issue on the official MelRoms repository.
