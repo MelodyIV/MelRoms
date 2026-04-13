@@ -8,7 +8,10 @@ MelRoms is a suite of programs I wasn't easily able to find and customize. I wan
 * **Optimized UI:** Designed for a high-performance, minimalist experience, though may not be perfect!
 
 ## 📸 Preview
-![MelRoms Launcher](9tOdtHeuW9.gif)
+https://melody.pussy.support/bombing/wm25gyl7.gif
+![pythonw_D5p2foowkV](https://github.com/user-attachments/assets/e3915127-db8a-4357-ac38-3f5b72bb797f)
+
+
 
 ## 🛠️ Tech Stack
 * **Language:** Python 3.14+
