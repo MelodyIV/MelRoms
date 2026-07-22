@@ -40,8 +40,6 @@ Cyber-Pong 3D ✧ Wireframe vector graphics, particle collision engine, audio-re
 
 3D Wireframe Pong ✧ Retrowave Pong utilizing perspective 3D projection, enemy AU, particle effects, and auditory cues.
 
-✧ 𝑲-𝑬-𝒀  𝑭-𝑬-𝑨-𝑻-𝑄-𝑑-𝑬-𝑺
-
 ˚.✦ 100% Local AI ✧ Zero external API calls. Saturn processes your entire workspace completely offline.
 ˚.✦ Universal JSON Theming ✧ Every window, UI border, and text element reads color arrays from JSON files. Or so I fucking tried anyway. Swap palates instantly.
 ˚.✦ Raw Performance ✧ Built directly on top of pygame-ce and CustomTkinter for minimal CPU idle usage. Though multiple windows will fuck your system.
