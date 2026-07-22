@@ -4,6 +4,12 @@ any personal workspace built out of necessity eventually turns into a full suite
 
 Everything runs local, strips away unnecessary electron overhead, and emphasizes raw utility, dark aesthetic controls, and heavy customizability.
 
+Preview
+
+![pythonw_D5p2foowkV](https://github.com/user-attachments/assets/e3915127-db8a-4357-ac38-3f5b72bb797f)
+
+![MelRoms Demo](https://r2.e-z.host/c1dfb951-530e-473a-b08b-5bc120684657/wm25gyl7.gif)
+
 ✧ 𝑾-𝑯-𝑨-𝑻 '𝑺  𝑰-𝑵-𝑺-𝑰-𝑫-𝑬
 
 ✦ Core Systems & Dev Workspace
